@@ -1,0 +1,92 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<br>
+<h1>{{ room.name }}</h1>
+<br>
+<div class="row float-container">
+  <h1>Book</h1>
+  <div class="float-child">
+    <form class="form" action="" method="POST">
+      {% csrf_token %}
+
+      <div class="form__group">
+        <label for="title">Title</label><br>
+        {{ form.title }}
+        <br>
+        <br>
+        <label for="bookStartTime">Book Start Time</label><br>
+        {{ form.bookStartTime }}
+        <br>
+        <br>
+        <label for="bookEndTime">Book End Time</label><br>
+        {{ form.bookEndTime }}
+      </div>
+      <br>
+      <div class="form__action">
+        <a class="btn btn--dark" href="{{request.META.HTTP_REFERER}}">Cancel</a>
+        <button class="btn btn--main" type="submit">Submit</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<br>
+<br>
+<div id="calendar"></div>
+
+  <style>
+    .float-container {
+    padding: 20px;
+}
+
+.float-child {
+    width: 50%;
+    float: left;
+    padding: 20px;
+}  
+</style>
+
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@5.10.1/main.css" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar-scheduler@5.10.1/main.js"></script>
+ 
+    <script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+  var calendarEl = document.getElementById('calendar');
+
+  var calendar = new FullCalendar.Calendar(calendarEl, {
+    timeZone: 'UTC',
+    initialView: 'dayGridMonth',
+    aspectRatio: 1.5,
+    editable: false,
+    selectable: false,
+    resourceAreaHeaderContent: 'Room',
+    resources:[
+        {
+          id: '{{ room.id }}',
+          title: '{{ room.name }}',
+        },
+    ],
+    events: [
+    {% for i in events %}
+    {% if i.isBooked %}
+        {
+            resourceId: '{{ i.bookFor }}',
+            title: '{{ i.title }}',
+            start: '{{ i.bookStartTime|date:"Y-m-d" }}T{{ i.bookStartTime|time:"H:i:s" }}',
+            end: '{{ i.bookEndTime|date:"Y-m-d" }}T{{ i.bookEndTime|time:"H:i:s" }}',
+        },
+        {% endif %}
+    {% endfor %}
+    ]
+  });
+  calendar.render();
+});
+
+    </script>
+
+{% endblock content %}
+
+
