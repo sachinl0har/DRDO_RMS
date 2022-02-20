@@ -1,0 +1,1 @@
+web: gunicorn DRDO_RMS.wsgi --log-file -
